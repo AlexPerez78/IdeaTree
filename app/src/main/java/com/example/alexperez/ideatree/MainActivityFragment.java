@@ -1,9 +1,10 @@
 package com.example.alexperez.ideatree;
 
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -36,6 +38,7 @@ public class MainActivityFragment extends Fragment {
 
     private ListView lv;
     private ArrayAdapter<String> adapter;
+    private List<String> link_images;
 
     public MainActivityFragment() {
     }
@@ -78,7 +81,7 @@ public class MainActivityFragment extends Fragment {
 
         ArrayList<String> data = new ArrayList<>();
 
-        adapter = new ArrayAdapter(getActivity(), R.layout.row, R.id.textView, data);
+        adapter = new ArrayAdapter(getActivity(), R.layout.row, R.id.trackTitle, data);
         lv.setAdapter(adapter);
         lv.setFastScrollEnabled(true);
 
@@ -87,6 +90,10 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Toast.makeText(getContext(), adapter.getItem(i), Toast.LENGTH_LONG).show();
+                Intent musicInfo = new Intent(getActivity(), MusicInfo.class);
+                musicInfo.putExtra("track_title", adapter.getItem(i)); //Get the items name
+
+                startActivity(musicInfo);
             }
         });
 
@@ -108,11 +115,13 @@ public class MainActivityFragment extends Fragment {
 
             String songJsonStr = null;
             String[] results = null;
+            String[] images = null;
 
             try {
 
                 String baseUrl = "https://itunes.apple.com/search?term=Michael+jackson";
                 URL url = new URL(baseUrl);
+
 
                 Log.d(LOG_TAG, "URL Returned: " + url);
 
@@ -143,10 +152,13 @@ public class MainActivityFragment extends Fragment {
                 songJsonStr = buffer.toString();
                 Log.d(LOG_TAG, "JSON returned: " + songJsonStr);
                 results = getSongTitleDataFromJson(songJsonStr,50);
+                images = getSongArtworkDataFromJson(songJsonStr,50);
 
-                for (String s : results) {
-                    Log.d(LOG_TAG, s);
-                }
+                link_images = Arrays.asList(images); //Add the links from the images function into a Arraylist to de-complile?
+
+//                for (String s : results) {
+//                    Log.d(LOG_TAG, s);
+//                }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 return null;
@@ -200,6 +212,34 @@ public class MainActivityFragment extends Fragment {
             }
 
             return resultStrs;
+        }
+
+        private String[] getSongArtworkDataFromJson(String songJsonStr, int numOfSongs)
+                throws JSONException {
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String JSON_results = "results";
+            final String JSON_ARTWORK = "artworkUrl60";
+
+            JSONObject root = new JSONObject(songJsonStr);
+            JSONArray songArray = root.getJSONArray(JSON_results);
+
+            String[] resultImgs = new String[numOfSongs];
+            for(int i = 0; i < songArray.length(); i++){
+
+                JSONObject firstTitle = songArray.getJSONObject(i);
+
+                String artwork = firstTitle.getString(JSON_ARTWORK);
+
+
+                resultImgs[i] = artwork;
+            }
+
+            for(String s: resultImgs){
+                Log.v(LOG_TAG, "Link Img: " + s);
+            }
+
+            return resultImgs;
         }
     }
 }
