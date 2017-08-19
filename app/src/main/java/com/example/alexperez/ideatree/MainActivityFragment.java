@@ -30,7 +30,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +40,7 @@ public class MainActivityFragment extends Fragment {
     private ListView lv;
     private ArrayAdapter<String> adapter;
     Map<String, ArrayList<String>> song_Information = new HashMap<>();
-    private List<String> link_images;
+    //private List<String> link_images;
 
     public MainActivityFragment() {
     }
@@ -94,11 +93,18 @@ public class MainActivityFragment extends Fragment {
 
                 Toast.makeText(getContext(), adapter.getItem(i), Toast.LENGTH_LONG).show();
                 Intent musicInfo = new Intent(getActivity(), MusicInfo.class);
+
+                String date_time = song_Information.get(adapter.getItem(i)).get(3);
+                String[] itemFields = date_time.split(" ", 2);
+                String[] date_array = itemFields[0].split("T");
+                String year = date_array[0];
+
+                //Getting the info from the Map and The Adapter to send to the next activity
                 musicInfo.putExtra("track_title", adapter.getItem(i)); //Get the items name
                 musicInfo.putExtra("artist",song_Information.get(adapter.getItem(i)).get(0));
                 musicInfo.putExtra("album",song_Information.get(adapter.getItem(i)).get(1));
                 musicInfo.putExtra("photo", song_Information.get(adapter.getItem(i)).get(2));
-                musicInfo.putExtra("date", song_Information.get(adapter.getItem(i)).get(3));
+                musicInfo.putExtra("date", year);
 
                 System.out.println("ArrayList: " + song_Information.get(adapter.getItem(i)));
                 startActivity(musicInfo);
@@ -191,6 +197,7 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
+            //Before executing the listview the value of the Track titles wil be loaded into the adapter
             adapter.clear();
             adapter.addAll(new ArrayList<>(Arrays.asList(strings)));
         }
@@ -208,7 +215,7 @@ public class MainActivityFragment extends Fragment {
 
             JSONObject root = new JSONObject(songJsonStr);
             JSONArray songArray = root.getJSONArray(JSON_results);
-            String[] resultStrs = new String[numOfSongs];
+            String[] resultStrs = new String[numOfSongs]; //Will Add the List Of Track Names into this List
             for(int i = 0; i < songArray.length(); i++){
 
                 JSONObject firstTitle = songArray.getJSONObject(i);
@@ -223,8 +230,9 @@ public class MainActivityFragment extends Fragment {
                 }
                 if(firstTitle.has(JSON_ALBUM)){
                     album = firstTitle.getString(JSON_ALBUM);
-                    System.out.println("Track Title: " + title +  "\n Album: " + album);
+                    //System.out.println("Track Title: " + title +  "\n Album: " + album);
                 }
+                //Adding Track Information according to track title as key and having a arraylist that corresponds to the Track
                 song_Information.put(title, new ArrayList<>(Arrays.asList(artist, album, artwork, date)));
 
                 resultStrs[i] = title;

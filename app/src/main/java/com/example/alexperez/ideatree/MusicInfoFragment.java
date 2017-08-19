@@ -1,10 +1,8 @@
 package com.example.alexperez.ideatree;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -42,11 +35,11 @@ public class MusicInfoFragment extends Fragment {
         TextView track_tv = (TextView)rootView.findViewById(R.id.title_of_song);
         TextView artist_tv = (TextView)rootView.findViewById(R.id.artist_name);
         TextView album_tv = (TextView)rootView.findViewById(R.id.album_name);
-        TextView date_tv = (TextView)rootView.findViewById(R.id.year);
+        TextView date_tv = (TextView)rootView.findViewById(R.id.released);
         track_tv.setText(track_info);
         artist_tv.setText("Artist: " + artist_info);
         album_tv.setText("Album: " + album_info);
-        date_tv.setText("Year: " + date_info);
+        date_tv.setText("Released: " + date_info);
 
         String photo_info = intent.getStringExtra("photo");
         ImageView photo_album = (ImageView)rootView.findViewById(R.id.imageView);
