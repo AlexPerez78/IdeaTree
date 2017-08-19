@@ -29,7 +29,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -38,6 +40,7 @@ public class MainActivityFragment extends Fragment {
 
     private ListView lv;
     private ArrayAdapter<String> adapter;
+    Map<String, ArrayList<String>> song_Information = new HashMap<>();
     private List<String> link_images;
 
     public MainActivityFragment() {
@@ -79,9 +82,9 @@ public class MainActivityFragment extends Fragment {
 
         lv = (ListView) rootView.findViewById(R.id.listview);
 
-        ArrayList<String> data = new ArrayList<>();
+        ArrayList<String> track_names = new ArrayList<>();
 
-        adapter = new ArrayAdapter(getActivity(), R.layout.row, R.id.trackTitle, data);
+        adapter = new ArrayAdapter(getActivity(), R.layout.row, R.id.trackTitle, track_names);
         lv.setAdapter(adapter);
         lv.setFastScrollEnabled(true);
 
@@ -92,7 +95,12 @@ public class MainActivityFragment extends Fragment {
                 Toast.makeText(getContext(), adapter.getItem(i), Toast.LENGTH_LONG).show();
                 Intent musicInfo = new Intent(getActivity(), MusicInfo.class);
                 musicInfo.putExtra("track_title", adapter.getItem(i)); //Get the items name
+                musicInfo.putExtra("artist",song_Information.get(adapter.getItem(i)).get(0));
+                musicInfo.putExtra("album",song_Information.get(adapter.getItem(i)).get(1));
+                musicInfo.putExtra("photo", song_Information.get(adapter.getItem(i)).get(2));
+                musicInfo.putExtra("date", song_Information.get(adapter.getItem(i)).get(3));
 
+                System.out.println("ArrayList: " + song_Information.get(adapter.getItem(i)));
                 startActivity(musicInfo);
             }
         });
@@ -152,9 +160,9 @@ public class MainActivityFragment extends Fragment {
                 songJsonStr = buffer.toString();
                 Log.d(LOG_TAG, "JSON returned: " + songJsonStr);
                 results = getSongTitleDataFromJson(songJsonStr,50);
-                images = getSongArtworkDataFromJson(songJsonStr,50);
+                //images = getSongArtworkDataFromJson(songJsonStr,50);
 
-                link_images = Arrays.asList(images); //Add the links from the images function into a Arraylist to de-complile?
+                //link_images = Arrays.asList(images); //Add the links from the images function into a Arraylist to de-complile?
 
 //                for (String s : results) {
 //                    Log.d(LOG_TAG, s);
@@ -193,16 +201,31 @@ public class MainActivityFragment extends Fragment {
             // These are the names of the JSON objects that need to be extracted.
             final String JSON_results = "results";
             final String JSON_TITLE = "trackName";
+            final String JSON_ARTIST = "artistName";
+            final String JSON_ALBUM = "collectionName";
+            final String JSON_ARTWORK = "artworkUrl100";
+            final String JSON_RELEASE = "releaseDate";
 
             JSONObject root = new JSONObject(songJsonStr);
             JSONArray songArray = root.getJSONArray(JSON_results);
-
             String[] resultStrs = new String[numOfSongs];
             for(int i = 0; i < songArray.length(); i++){
 
                 JSONObject firstTitle = songArray.getJSONObject(i);
 
+                String artwork = firstTitle.getString(JSON_ARTWORK);
                 String title = firstTitle.getString(JSON_TITLE);
+                String date = firstTitle.getString(JSON_RELEASE);
+                String artist = "";
+                String album = "";
+                if(firstTitle.has(JSON_ARTIST)){
+                    artist = firstTitle.getString(JSON_ARTIST);
+                }
+                if(firstTitle.has(JSON_ALBUM)){
+                    album = firstTitle.getString(JSON_ALBUM);
+                    System.out.println("Track Title: " + title +  "\n Album: " + album);
+                }
+                song_Information.put(title, new ArrayList<>(Arrays.asList(artist, album, artwork, date)));
 
                 resultStrs[i] = title;
             }
@@ -214,32 +237,32 @@ public class MainActivityFragment extends Fragment {
             return resultStrs;
         }
 
-        private String[] getSongArtworkDataFromJson(String songJsonStr, int numOfSongs)
-                throws JSONException {
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String JSON_results = "results";
-            final String JSON_ARTWORK = "artworkUrl60";
-
-            JSONObject root = new JSONObject(songJsonStr);
-            JSONArray songArray = root.getJSONArray(JSON_results);
-
-            String[] resultImgs = new String[numOfSongs];
-            for(int i = 0; i < songArray.length(); i++){
-
-                JSONObject firstTitle = songArray.getJSONObject(i);
-
-                String artwork = firstTitle.getString(JSON_ARTWORK);
-
-
-                resultImgs[i] = artwork;
-            }
-
-            for(String s: resultImgs){
-                Log.v(LOG_TAG, "Link Img: " + s);
-            }
-
-            return resultImgs;
-        }
+//        private String[] getSongArtworkDataFromJson(String songJsonStr, int numOfSongs)
+//                throws JSONException {
+//
+//            // These are the names of the JSON objects that need to be extracted.
+//            final String JSON_results = "results";
+//            final String JSON_ARTWORK = "artworkUrl60";
+//
+//            JSONObject root = new JSONObject(songJsonStr);
+//            JSONArray songArray = root.getJSONArray(JSON_results);
+//
+//            String[] resultImgs = new String[numOfSongs];
+//            for(int i = 0; i < songArray.length(); i++){
+//
+//                JSONObject firstTitle = songArray.getJSONObject(i);
+//
+//                String artwork = firstTitle.getString(JSON_ARTWORK);
+//
+//
+//                resultImgs[i] = artwork;
+//            }
+//
+//            for(String s: resultImgs){
+//                Log.v(LOG_TAG, "Link Img: " + s);
+//            }
+//
+//            return resultImgs;
+//        }
     }
 }
