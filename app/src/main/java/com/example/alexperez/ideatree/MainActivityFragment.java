@@ -91,7 +91,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Toast.makeText(getContext(), adapter.getItem(i), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), adapter.getItem(i), Toast.LENGTH_LONG).show();
                 Intent musicInfo = new Intent(getActivity(), MusicInfo.class);
 
                 String date_time = song_Information.get(adapter.getItem(i)).get(3);
