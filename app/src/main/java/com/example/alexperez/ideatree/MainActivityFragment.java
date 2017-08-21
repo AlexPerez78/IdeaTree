@@ -51,6 +51,7 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    //On Start of the application, gather the Info from the JSON
     @Override
     public void onStart(){
         super.onStart();
@@ -83,6 +84,7 @@ public class MainActivityFragment extends Fragment {
 
         ArrayList<String> track_names = new ArrayList<>();
 
+        //Array Adapter in which case has the custom row layout, track titles layout, and the array with the track titles data
         adapter = new ArrayAdapter(getActivity(), R.layout.row, R.id.trackTitle, track_names);
         lv.setAdapter(adapter);
         lv.setFastScrollEnabled(true);
@@ -202,6 +204,7 @@ public class MainActivityFragment extends Fragment {
             adapter.addAll(new ArrayList<>(Arrays.asList(strings)));
         }
 
+        //Will Return a Array of strings for the Data Array to be populated with.
         private String[] getSongTitleDataFromJson(String songJsonStr, int numOfSongs)
                 throws JSONException {
 
@@ -219,7 +222,7 @@ public class MainActivityFragment extends Fragment {
             for(int i = 0; i < songArray.length(); i++){
 
                 JSONObject firstTitle = songArray.getJSONObject(i);
-
+                //Getting the data from the JSON Array by data variable label
                 String artwork = firstTitle.getString(JSON_ARTWORK);
                 String title = firstTitle.getString(JSON_TITLE);
                 String date = firstTitle.getString(JSON_RELEASE);
